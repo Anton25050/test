@@ -18,7 +18,7 @@ use Yii;
  * @property Report[] $reports
  * @property Role $role
  */
-class User extends \yii\db\ActiveRecord
+class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
 {
     /**
      * {@inheritdoc}
@@ -76,4 +76,79 @@ class User extends \yii\db\ActiveRecord
     {
         return $this->hasOne(Role::class, ['id' => 'role_id']);
     }
+
+    public static function getInstance(): User {
+        return Yii::$app->user->identity;
+    }
+
+    public static function login($login, $password) {
+        $user = static::find()->where(['login'=> $login])->one();
+    
+        if ($user && $user->validatePassword($password)) {
+            return $user;
+        }
+    
+    // Иначе возвращать null
+    return null;
+}
+
+/**
+ * Скопировано из User.php.dist
+ * В будущем будет изменено для сравнения пароля по хешу
+ * Validates password
+ *
+ * @param string $password password to validate
+ * @return bool if password provided is valid for current user
+ */
+public function validatePassword($password)
+{
+    return $this->password === $password;
+}
+
+/**
+ * {@inheritdoc}
+ */
+public static function findIdentity($id)
+{
+    // Поиск пользователя по id. Может быть заменено на alias static::findOne(['id' => $id]);
+    return static::find()->where(['id' => $id])->one();
+}
+
+/**
+ * {@inheritdoc}
+ */
+public static function findIdentityByAccessToken($token, $type = null)
+{
+    // Работать с токенами не требуется, но методы обязательно надо реализовать, поэтому возвращаем null
+    return null;
+}
+
+/**
+ * {@inheritdoc}
+ */
+public function getId()
+{
+    return $this->id;
+}
+
+/**
+ * {@inheritdoc}
+ */
+public function getAuthKey()
+{
+    // Работать с токенами не требуется, но методы обязательно надо реализовать, поэтому возвращаем null
+    return null;
+}
+
+/**
+ * {@inheritdoc}
+ */
+public function validateAuthKey($authKey)
+{
+    // Работать с токенами не требуется, но методы обязательно надо реализовать, поэтому возвращаем null
+    return null;
+}
+public function isAdmin() {
+    return $this->role_id == Role::ADMIN_ROLE_ID;
+}
 }
