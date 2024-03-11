@@ -4,6 +4,7 @@
 /** @var string $content */
 
 use app\assets\AppAsset;
+use app\models\Role;
 use app\widgets\Alert;
 use yii\bootstrap5\Breadcrumbs;
 use yii\bootstrap5\Html;
@@ -32,27 +33,42 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
 <header id="header">
     <?php
     NavBar::begin([
-        'brandLabel' => Yii::$app->name,
+        'brandLabel' => 'ГосНомер',
         'brandUrl' => Yii::$app->homeUrl,
         'options' => ['class' => 'navbar-expand-md navbar-dark bg-dark fixed-top']
     ]);
+
+    $items = [
+        ['label' => 'Home', 'url' => ['../']],
+
+    ];
+
+    if (!Yii::$app->user->isGuest && Yii::$app->user->identity->role_id == Role::ADMIN_ROLE_ID) {
+        $items[] = ['label'=> 'сыч','url'=> ['/site/index']];
+    }
+
+    if (Yii::$app->user->isGuest) {
+        $items[] = ['label' => 'Login', 'url' => ['/site/login']];
+        $items[] = ['label' => 'Register', 'url' => ['/user/create']];
+    } else {
+        $items[] = ['label' => 'Заявка', 'url' => ['/report/index']];
+        $items[] = '<li class="nav-item">'
+            . Html::beginForm(['/site/logout'])
+            . Html::submitButton(
+                // Yii::$app->user возвращает нам объект для работы с пользователем
+                // Yii::$app->user->identity возвращает экземпляр модели, которую мы назначили при авторизации
+                // В данном случае экземпляр app\models\User, у которого нет свойства username, поэтому мы его меняем на поле, которое есть
+                // Можем убирать и вывести в другом месте по желанию
+                'Logout (' . Yii::$app->user->identity->login . ')',
+                ['class' => 'nav-link btn btn-link logout']
+            )
+            . Html::endForm()
+        . '</li>';
+    }
+
     echo Nav::widget([
         'options' => ['class' => 'navbar-nav'],
-        'items' => [
-            ['label' => 'Home', 'url' => ['/site/index']],
-            ['label' => 'About', 'url' => ['/site/about']],
-            ['label' => 'Contact', 'url' => ['/site/contact']],
-            Yii::$app->user->isGuest
-                ? ['label' => 'Login', 'url' => ['/site/login']]
-                : '<li class="nav-item">'
-                    . Html::beginForm(['/site/logout'])
-                    . Html::submitButton(
-                        'Logout (' . Yii::$app->user->identity->login . ')',
-                        ['class' => 'nav-link btn btn-link logout']
-                    )
-                    . Html::endForm()
-                    . '</li>'
-        ]
+        'items' => $items
     ]);
     NavBar::end();
     ?>
