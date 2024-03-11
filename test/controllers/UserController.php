@@ -2,7 +2,9 @@
 
 namespace app\controllers;
 
+use app\models\Role;
 use app\models\User;
+use app\models\UserRegister;
 use app\models\UserSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -70,8 +72,15 @@ class UserController extends Controller
         $model = new User();
 
         if ($this->request->isPost) {
-            if ($model->load($this->request->post()) && $model->save()) {
-                return $this->redirect(['view', 'id' => $model->id]);
+            // Можно поставить $model->validate(), для проверки валидации, но она автоматически проверяется методом $model->save()
+            if ($model->load($this->request->post())) {
+                // Назначаем новому пользователю id роли пользователя
+                $model->role_id = Role::USER_ROLE_ID;
+                // Переносим сохранение модели в отдельное условие, чтобы была возможность добавить id роли до сохранения
+                if ($model->save()) {
+                    // Переносим пользователя на страницу аутентификации при успешном созранении модели
+                    return $this->redirect('/site/login');
+                }
             }
         } else {
             $model->loadDefaultValues();
@@ -81,7 +90,6 @@ class UserController extends Controller
             'model' => $model,
         ]);
     }
-
     /**
      * Updates an existing User model.
      * If update is successful, the browser will be redirected to the 'view' page.

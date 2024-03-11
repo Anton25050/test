@@ -36,6 +36,7 @@ class User extends \yii\db\ActiveRecord
         return [
             [['role_id'], 'integer'],
             [['login', 'password', 'email', 'phone', 'fio'], 'string', 'max' => 255],
+            [['email'], 'email'],
             [['role_id'], 'exist', 'skipOnError' => true, 'targetClass' => Role::class, 'targetAttribute' => ['role_id' => 'id']],
         ];
     }
