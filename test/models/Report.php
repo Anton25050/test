@@ -50,7 +50,7 @@ class Report extends \yii\db\ActiveRecord
             'number' => 'Number',
             'description' => 'Description',
             'user_id' => 'User ID',
-            'status_id' => 'Status ID',
+            'status' => 'Status ID',
         ];
     }
 

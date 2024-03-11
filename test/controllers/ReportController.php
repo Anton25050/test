@@ -4,6 +4,9 @@ namespace app\controllers;
 
 use app\models\Report;
 use app\models\ReportSearch;
+use app\models\Role;
+use app\models\Status;
+use app\models\User;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -38,8 +41,17 @@ class ReportController extends Controller
      */
     public function actionIndex()
     {
+
+        $user = User::getInstance();
+        if (!$user) {
+            return $this->goHome();
+        }
         $searchModel = new ReportSearch();
-        $dataProvider = $searchModel->search($this->request->queryParams);
+        $userID = null;
+        if ($user->role_id != Role::ADMIN_ROLE_ID) {
+            $userID = $user->id;  
+        } 
+        $dataProvider = $searchModel->search($this->request->queryParams, $userID);
 
         return $this->render('index', [
             'searchModel' => $searchModel,
@@ -67,12 +79,20 @@ class ReportController extends Controller
      */
     public function actionCreate()
     {
+        $user  = User::getInstance();
+        if (!$user) {
+            return $this->goHome();
+        }
         $model = new Report();
 
         if ($this->request->isPost) {
-            if ($model->load($this->request->post()) && $model->save()) {
-                return $this->redirect(['view', 'id' => $model->id]);
+            if ($model->load($this->request->post())) {
+                $model->user_id = $user->id;
+                $model->status_id = Status::NEW_STATUS_ID;
+                if ($model->save()) {
+                return $this->redirect(['index']);
             }
+        }
         } else {
             $model->loadDefaultValues();
         }
@@ -81,7 +101,26 @@ class ReportController extends Controller
             'model' => $model,
         ]);
     }
+    
 
+//     public function actionFormUpdate()
+//     {
+//         $user = Role::ADMIN_ROLE_ID;
+//         if (!$user) {
+//             return $this->goHome();
+//     }
+//     $model = new Report();
+    
+//     if ($this->request->isPost) {
+//         if ($model->load($this->request->post())) {
+//             $model->save();
+//         return $this->redirect(['index']);
+//         }
+//     }
+//     return $this->render('_formUpdate', [
+//         'model' => $model,
+//     ]);
+// }
     /**
      * Updates an existing Report model.
      * If update is successful, the browser will be redirected to the 'view' page.
@@ -94,9 +133,8 @@ class ReportController extends Controller
         $model = $this->findModel($id);
 
         if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+            return $this->redirect(['index']);
         }
-
         return $this->render('update', [
             'model' => $model,
         ]);
