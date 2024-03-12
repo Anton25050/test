@@ -7,9 +7,11 @@ use app\models\ReportSearch;
 use app\models\Role;
 use app\models\Status;
 use app\models\User;
+use Yii;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\web\UploadedFile;
 
 /**
  * ReportController implements the CRUD actions for Report model.
@@ -89,17 +91,20 @@ class ReportController extends Controller
             if ($model->load($this->request->post())) {
                 $model->user_id = $user->id;
                 $model->status_id = Status::NEW_STATUS_ID;
+                $model->image = UploadedFile::getInstance($model, 'image');
+                $model->image->name = '/uploads/' . $model->image->baseName . '.' . $model->image->extension;
                 if ($model->save()) {
-                return $this->redirect(['index']);
+                    $model->image->saveAs($model->image->name);
+                    return $this->redirect(['index']);
+                }
+            } else {
+                $model->loadDefaultValues();
             }
-        }
-        } else {
-            $model->loadDefaultValues();
-        }
 
-        return $this->render('create', [
-            'model' => $model,
-        ]);
+            return $this->render('create', [
+                'model' => $model,
+            ]);
+        }
     }
     
 
@@ -169,4 +174,20 @@ class ReportController extends Controller
 
         throw new NotFoundHttpException('The requested page does not exist.');
     }
+
+// public function actionUpload(){
+//     $model = new Report();
+//     if ($model->load(Yii::$app->request->post())) {
+//         $model->image = UploadedFile::getInstance($model, 'image');
+//         if($this->validate()){
+//             if ($model->image && $model->upload()) {
+//                 $model->image = $this->image->baseName . '.' . $this->image->extension;
+//             }
+//             if($this->save()){
+//                 return $this->redirect(['index']);
+            
+//         }
+//     }
+// }  
+// }
 }
