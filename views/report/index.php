@@ -5,6 +5,7 @@ use app\models\Role;
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\grid\ActionColumn;
+use yii\grid\Column;
 use yii\grid\GridView;
 
 /** @var yii\web\View $this */
@@ -33,6 +34,13 @@ $this->params['breadcrumbs'][] = $this->title;
             'id',
             'number',
             'description:ntext',
+            'image',
+            [
+                'attribute' => 'image',
+                'content' => function ($report) {
+                    return '<img src="/'.$report->image . '">';
+                }
+            ],
             'user_id',
             'status',
             [

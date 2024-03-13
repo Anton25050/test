@@ -17,7 +17,7 @@ use Yii;
  * @property User $user
  */
 class Report extends \yii\db\ActiveRecord
-{
+{ 
     /**
      * {@inheritdoc}
      */
@@ -35,6 +35,7 @@ class Report extends \yii\db\ActiveRecord
             [['description'], 'string'],
             [['user_id', 'status_id'], 'integer'],
             [['number'], 'string', 'max' => 127],
+            [['image'], 'file', 'extensions' => 'png, jpg'],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
             [['status_id'], 'exist', 'skipOnError' => true, 'targetClass' => Status::class, 'targetAttribute' => ['status_id' => 'id']],
         ];
@@ -49,6 +50,7 @@ class Report extends \yii\db\ActiveRecord
             'id' => 'ID',
             'number' => 'Number',
             'description' => 'Description',
+            'image' => 'фотография',
             'user_id' => 'User ID',
             'status' => 'Status ID',
         ];
@@ -72,5 +74,13 @@ class Report extends \yii\db\ActiveRecord
     public function getUser()
     {
         return $this->hasOne(User::class, ['id' => 'user_id']);
+    }
+
+    public function upload(){
+        if($this->validate()){
+            $this->image->saveAs("uploads/{$this->image->baseName}.{$this->image->extension}");
+        }else{
+            return false;
+        }
     }
 }
