@@ -17,8 +17,7 @@ use Yii;
  * @property User $user
  */
 class Report extends \yii\db\ActiveRecord
-{
-    public $image;  
+{ 
     /**
      * {@inheritdoc}
      */

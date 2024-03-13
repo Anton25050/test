@@ -92,7 +92,7 @@ class ReportController extends Controller
                 $model->user_id = $user->id;
                 $model->status_id = Status::NEW_STATUS_ID;
                 $model->image = UploadedFile::getInstance($model, 'image');
-                $model->image->name = '/uploads/' . $model->image->baseName . '.' . $model->image->extension;
+                $model->image->name = 'uploads/' . $model->image->baseName . '.' . $model->image->extension;
                 if ($model->save()) {
                     $model->image->saveAs($model->image->name);
                     return $this->redirect(['index']);
@@ -100,11 +100,11 @@ class ReportController extends Controller
             } else {
                 $model->loadDefaultValues();
             }
-
-            return $this->render('create', [
-                'model' => $model,
-            ]);
         }
+
+        return $this->render('create', [
+            'model' => $model,
+        ]);
     }
     
 
