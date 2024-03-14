@@ -17,6 +17,18 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="report-index">
 
+
+<style>
+
+    .ded > * {
+        background-color: rgba(0, 58, 255, 0.4)  !important;
+    }
+
+    .neded > * {
+        background-color: rgba(255, 0, 9, 0.4) !important;
+    }
+</style>
+
     <h1><?= Html::encode($this->title) ?></h1>
 
     <p>
@@ -37,9 +49,24 @@ $this->params['breadcrumbs'][] = $this->title;
             'image',
             [
                 'attribute' => 'image',
-                'content' => function ($report) {
-                    return '<img src="/'.$report->image . '">';
+                'format'=> 'html',
+                'value' => function($report) {
+                    return '<img src="' . Url::toRoute($report->image) . '" style="width:200px" />';
                 }
+            
+               /*
+               
+                'attribute' => 'image',
+                'content' => function($report) {
+                    return '<img src="' . Url::toRoute($report->image) . '" style="width:100px" />';
+                },
+
+               */
+                
+                // 'format' => ['image',['width'=>'50px','height'=>'50px']],
+                // 'content' => function ($report) {
+                //     return '<img src="/'.$report->image . '">';
+                // }
             ],
             'user_id',
             'status',
@@ -52,6 +79,12 @@ $this->params['breadcrumbs'][] = $this->title;
                  }
             ],
         ],
+        'rowOptions' => function($model, $key, $index, $column) {   
+            if ($index %2 == 0) {
+                return ['class' => 'ded'];
+            }
+            return ['class' => 'neded'];
+        },
     ]); ?>
 
 

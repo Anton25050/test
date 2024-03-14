@@ -83,4 +83,10 @@ class Report extends \yii\db\ActiveRecord
             return false;
         }
     }
+
+    public function getimageurl()
+   {
+      // return your image url here
+      return \Yii::$app->request->BaseUrl.'uploads/'.$this->image;
+   }
 }
